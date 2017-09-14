@@ -1,0 +1,27 @@
+{
+  "builders": [{
+    "type": "vmware-vmx",
+    "source_path": "./Fedora 64-bit.vmwarevm/Fedora 64-bit.vmx",
+    "ssh_username": "root",
+    "ssh_password": "root",
+    "ssh_wait_timeout": "30s",
+    "shutdown_command": "echo 'packer' | sudo -S shutdown -P now"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": ["sed -i s/^#baseurl/baseurl/g /etc/yum.repos.d/fedora.repo"],
+    "inline": ["sed -i s/^metalink/#metalink/g /etc/yum.repos.d/fedora.repo"],
+    "inline": ["sed -i s+download.fedoraproject.org+192.168.1.15+g /etc/yum.repos.d/fedora.repo"],
+    "inline": ["sed -i s/^#baseurl/baseurl/g /etc/yum.repos.d/fedora-updates.repo"],
+    "inline": ["sed -i s/^metalink/#metalink/g /etc/yum.repos.d/fedora-updates.repo"],
+    "inline": ["sed -i s+download.fedoraproject.org+192.168.1.15+g /etc/yum.repos.d/fedora-updates.repo"],
+    "inline": ["dnf clean all"],
+    "inline": ["dnf update -y"],
+    "inline": ["dnf install open-vm-tools -y"]
+  }],
+  "post-processors": [{
+    "type": "vagrant",
+    "keep_input_artifact": true,
+    "output": "kilroy396-fedora26.box"
+  }]
+}
